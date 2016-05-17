@@ -46,6 +46,8 @@ controller.hears(['all'], ['direct_mention'], function (bot, message) {
           bot.reply(message, '`' + keys[key] + '`: `' + values[key] + '`')
         }
       })
+    } else {
+      bot.reply(message, 'There no any definitions saved yet')
     }
   })
 })
