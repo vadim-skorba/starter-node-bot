@@ -40,34 +40,38 @@ var kv = require('beepboop-persist')()
 
 controller.hears(['all'], ['direct_mention'], function (bot, message) {
   kv.list(function (err, keys) {
-    if (keys.length) {
-      kv.mget(keys, function (err, values) {
-        for (key in keys) {
-          bot.reply(message, '`' + keys[key] + '`: `' + values[key] + '`')
-        }
-      })
-    } else {
-      bot.reply(message, 'There no any definitions saved yet')
-    }
+    bot.startPrivateConversation({user: message.user}, function(response, convo){
+      convo.say('You requested list of all definitions:')
+      if (keys.length) {
+        kv.mget(keys, function (err, values) {
+          for (key in keys) {
+            convo.say('`' + keys[key] + '`: ```' + values[key] + '```')
+          }
+        })
+      } else {
+        convo.say('There no any definitions saved yet')
+      }
+    })
   })
 })
 
-controller.hears(['^(.+?)=(.+?)$'], ['direct_mention'], function (bot, message) {
-  kv.get(message.match[1], function (err, val) {
+controller.hears(['^(.+?)=([^]+?)$'], ['direct_mention'], function (bot, message) {
+  kv.get(message.match[1].toLowerCase(), function (err, val) {
     if (val) {
-      bot.reply(message, '`' + message.match[1] + '` already saved as `' + val + '`')
+      bot.reply(message, '`' + message.match[1] + '` already saved as: ```' + val + '```')
     } else {
-      kv.set(message.match[1], message.match[2], function (err) {
-        bot.reply(message, '`' + message.match[1] + '` successfully saved as `' + message.match[2] + '`')
+      value = message.match[2].replace(/<([^@\#\!].*?)(\|.*?)?>/, '$1')
+      kv.set(message.match[1].toLowerCase(), value, function (err) {
+        bot.reply(message, '`' + message.match[1] + '` successfully saved as: ```' + value + '```')
       })
     }
   })
 })
 
 controller.hears(['^.+$'], ['direct_mention'], function (bot, message) {
-  kv.get(message.text, function (err, val) {
+  kv.get(message.text.toLowerCase(), function (err, val) {
     if (val) {
-      bot.reply(message, 'Definition for `' + message.text + '` is `' + val + '`')
+      bot.reply(message, 'Definition for `' + message.text + '` is: ```' + val + '```')
     } else {
       bot.reply(message, 'Definition for `' + message.text + '` is not defined yet. Define it as: `<@' + bot.identity.id + '> ' + message.text + '=Definition text`')
     }
