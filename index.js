@@ -78,6 +78,15 @@ controller.hears(['^.+$'], ['direct_mention'], function (bot, message) {
   })
 })
 
+controller.hears('help', ['direct_message', 'direct_mention'], function (bot, message) {
+  var help = 'I will respond to the following messages: \n' +
+      '`<@' + bot.identity.id + '> key` to show saved definition.\n' +
+      '`<@' + bot.identity.id + '> key=Definition text` to save new definition.\n' +
+      '`<@' + bot.identity.id + '> all` to review all existing definitions (will send as Direct Message).\n' +
+      '`<@' + bot.identity.id + '> help` to see this again.'
+  bot.reply(message, help)
+})
+
 /*controller.on('bot_channel_join', function (bot, message) {
   bot.reply(message, "I'm here!")
 })
@@ -93,15 +102,6 @@ controller.hears(['hello', 'hi'], ['direct_message'], function (bot, message) {
 
 controller.hears('.*', ['mention'], function (bot, message) {
   bot.reply(message, 'You really do care about me. :heart:')
-})
-
-controller.hears('help', ['direct_message', 'direct_mention'], function (bot, message) {
-  var help = 'I will respond to the following messages: \n' +
-      '`bot hi` for a simple message.\n' +
-      '`bot attachment` to see a Slack attachment message.\n' +
-      '`@<your bot\'s name>` to demonstrate detecting a mention.\n' +
-      '`bot help` to see this again.'
-  bot.reply(message, help)
 })
 
 controller.hears(['attachment'], ['direct_message', 'direct_mention'], function (bot, message) {
@@ -124,5 +124,5 @@ controller.hears(['attachment'], ['direct_message', 'direct_mention'], function 
 })*/
 
 controller.hears('.*', ['direct_message', 'direct_mention'], function (bot, message) {
-  bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n')
+  bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand.\nTry to use: `<@' + bot.identity.id + '> help`')
 })
