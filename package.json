@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/beepboophq/node-slack-bot#readme",
   "dependencies": {
+    "beepboop-persist": "0.0.7",
     "botkit": "0.0.5"
   }
 }

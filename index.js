@@ -18,7 +18,61 @@ bot.startRTM(function (err, bot, payload) {
   }
 })
 
-controller.on('bot_channel_join', function (bot, message) {
+var kv = require('beepboop-persist')()
+/*kv.set('a key', 'the key, is water', function (err) {
+  // handle error :)
+  kv.get('a key', function (err, val) {
+    // handle error :)
+    // val should be 'the key, is water'
+    console.log(val)
+
+    kv.list(function (err, keys) {
+        console.log(keys)
+      // handle error :)
+      // keys should be ['a key']
+      kv.del('a key', function (err) {
+        // handle error :)
+        // 'a key' should be deleted
+      })
+    })
+  })
+})*/
+
+controller.hears(['all'], ['direct_mention'], function (bot, message) {
+  kv.list(function (err, keys) {
+    if (keys.length) {
+      kv.mget(keys, function (err, values) {
+        for (key in keys) {
+          bot.reply(message, '`' + keys[key] + '`: `' + values[key] + '`')
+        }
+      })
+    }
+  })
+})
+
+controller.hears(['^(.+?)=(.+?)$'], ['direct_mention'], function (bot, message) {
+  kv.get(message.match[1], function (err, val) {
+    if (val) {
+      bot.reply(message, '`' + message.match[1] + '` already saved as `' + val + '`')
+    } else {
+      kv.set(message.match[1], message.match[2], function (err) {
+        bot.reply(message, '`' + message.match[1] + '` successfully saved as `' + message.match[2] + '`')
+      })
+    }
+  })
+})
+
+controller.hears(['^.+$'], ['direct_mention'], function (bot, message) {
+  kv.get(message.text, function (err, val) {
+    if (val) {
+      bot.reply(message, 'Definition for `' + message.text + '` is `' + val + '`')
+    } else {
+      bot.reply(message, 'Definition for `' + message.text + '` is not defined yet. Define it as: `<@' + bot.identity.id + '> ' + message.text + '=Definition text`')
+    }
+  })
+})
+
+/*controller.on('bot_channel_join', function (bot, message) {
   bot.reply(message, "I'm here!")
 })
 
@@ -61,7 +115,7 @@ controller.hears(['attachment'], ['direct_message', 'direct_mention'], function 
   }, function (err, resp) {
     console.log(err, resp)
   })
-})
+})*/
 
 controller.hears('.*', ['direct_message', 'direct_mention'], function (bot, message) {
   bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n')
